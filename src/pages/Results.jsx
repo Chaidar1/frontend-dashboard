@@ -1,7 +1,8 @@
 // src/pages/Results.jsx
 import { useState, useEffect } from "react";
-import { useParams, Link }from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import {
   Download,
   ArrowLeft,
@@ -16,7 +17,9 @@ import {
   Brain,
   FileText,
   CheckCircle,
-  XCircle
+  XCircle,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -46,6 +49,9 @@ export default function Results() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(50);
+  
+  // 🔥 State untuk toggle tampilan data asli
+  const [showRawData, setShowRawData] = useState(false);
 
   const COLORS = isDarkMode ? COLORS_DARK : COLORS_LIGHT;
 
@@ -83,7 +89,9 @@ export default function Results() {
         });
       }
       
-      console.log("📊 all_predictions:", data.all_predictions);
+      console.log("📊 all_predictions:", data.all_predictions?.length || 0);
+      console.log("📊 original_data:", data.original_data?.length || 0, "rows");
+      console.log("📊 feature_columns:", data.feature_columns?.length || 0, "columns");
       
       setResult({
         ...data,
@@ -91,7 +99,9 @@ export default function Results() {
         class_f1_scores: classF1Scores,
         confusion_matrix: confusionMatrix,
         classes: data.classes || DEFAULT_CLASSES,
-        all_predictions: data.all_predictions || []
+        all_predictions: data.all_predictions || [],
+        original_data: data.original_data || [],
+        feature_columns: data.feature_columns || []
       });
     } catch (error) {
       console.error("Error fetching result:", error);
@@ -133,6 +143,42 @@ export default function Results() {
     return (total / count).toFixed(1);
   };
 
+  // 🔥 Fungsi untuk mendapatkan warna berdasarkan kelas prediksi
+  const getClassColor = (predictedClass) => {
+    const colors = {
+      'Benign': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+      'Generic': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+      'Unknown': 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+      'Backdoor': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+      'Exploits': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+      'Trojan': 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+      'Malware traffic': 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+      'Web threats': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+      'DoS attacks': 'bg-red-200 text-red-800 dark:bg-red-800/30 dark:text-red-300',
+      'Buffer Overflow': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+    };
+    return colors[predictedClass] || 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+  };
+
+  // 🔥 Gabungkan data asli dengan prediksi
+  const getCombinedData = () => {
+    if (!result?.original_data || !result?.all_predictions) {
+      return [];
+    }
+    
+    return result.original_data.map((row, index) => {
+      const prediction = result.all_predictions[index] || {};
+      return {
+        ...row,
+        row_index: index + 1,
+        predicted_class: prediction.predicted_class || 'Unknown',
+        confidence_score: prediction.confidence_score || 0,
+        is_correct: prediction.is_correct || false,
+        actual_class: prediction.actual_class || null
+      };
+    });
+  };
+
   const customTooltipStyle = {
     backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
     border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
@@ -154,13 +200,34 @@ export default function Results() {
     }));
   }
 
-  const totalPages = Math.ceil(allPredictions.length / rowsPerPage);
+  // 🔥 Data untuk tabel
+  const combinedData = getCombinedData();
+  const featureColumns = result?.feature_columns || [];
+  const hasOriginalData = result?.original_data && result.original_data.length > 0;
+  
+  // Gunakan combinedData jika ada, otherwise gunakan allPredictions
+  const displayData = hasOriginalData ? combinedData : allPredictions;
+  const totalDataPages = Math.ceil(displayData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = Math.min(startIndex + rowsPerPage, allPredictions.length);
-  const currentPredictions = allPredictions.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + rowsPerPage, displayData.length);
+  const currentData = displayData.slice(startIndex, endIndex);
+
+  const totalPages = Math.ceil(allPredictions.length / rowsPerPage);
+  const predStartIndex = (currentPage - 1) * rowsPerPage;
+  const predEndIndex = Math.min(predStartIndex + rowsPerPage, allPredictions.length);
+  const currentPredictions = allPredictions.slice(predStartIndex, predEndIndex);
 
   const goToPage = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  // 🔥 Toggle detail data dengan toast info jika tidak tersedia
+  const toggleDetailData = () => {
+    if (hasOriginalData) {
+      setShowRawData(!showRawData);
+    } else {
+      toast.info("Data detail tidak tersedia untuk pengujian ini. Upload ulang file CSV untuk menyimpan data lengkap.");
+    }
   };
 
   if (loading) {
@@ -213,7 +280,7 @@ export default function Results() {
         </button>
       </div>
 
-      {/* 🔥 Metrics Cards - Mode Prediksi (4 card) tetap ukuran normal, Mode Evaluasi (5 card) diperkecil */}
+      {/* 🔥 Metrics Cards */}
       {hasLabel ? (
         // 🔥 Mode Evaluasi (Ada Label) - 5 Card dalam 1 baris dengan ukuran lebih kecil
         <div className="grid grid-cols-5 gap-3">
@@ -515,7 +582,7 @@ export default function Results() {
         </div>
       </div>
 
-      {/* ALL Predictions Table */}
+      {/* 🔥 ALL Predictions Table - Dengan Detail Data */}
       <div className={`rounded-xl shadow-sm border p-6 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2">
@@ -527,97 +594,204 @@ export default function Results() {
               </span>
             </h2>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <span className={themeClasses.textMuted}>
+          <div className="flex items-center gap-3">
+            {/* 🔥 Button Detail Data - Selalu Tampil */}
+            <button
+              onClick={toggleDetailData}
+              className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-2 ${
+                showRawData && hasOriginalData
+                  ? isDarkMode ? "bg-blue-600 text-white" : "bg-blue-600 text-white"
+                  : isDarkMode ? "bg-gray-700 text-gray-300 hover:bg-gray-600" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              } ${!hasOriginalData ? "opacity-60" : ""}`}
+              title={!hasOriginalData ? "Data detail tidak tersedia. Upload ulang file CSV untuk menyimpan data lengkap." : ""}
+            >
+              {showRawData && hasOriginalData ? (
+                <>
+                  <EyeOff className="w-4 h-4" />
+                  Sembunyikan Detail
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4" />
+                  Detail Data
+                </>
+              )}
+            </button>
+            <span className={`text-sm ${themeClasses.textMuted}`}>
               Menampilkan {startIndex + 1} - {endIndex} dari {allPredictions.length}
             </span>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className={isDarkMode ? "bg-gray-700" : "bg-gray-50"}>
-              <tr>
-                <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>#</th>
-                <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Kelas Aktual</th>
-                <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Prediksi</th>
-                <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Confidence</th>
-                <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Status</th>
-              </tr>
-            </thead>
-            <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-100"}`}>
-              {currentPredictions.length > 0 ? (
-                currentPredictions.map((pred, idx) => {
+          {showRawData && hasOriginalData ? (
+            // 🔥 Tabel Data Asli dengan Warna
+            <table className="w-full">
+              <thead className={isDarkMode ? "bg-gray-700" : "bg-gray-50"}>
+                <tr>
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>#</th>
+                  
+                  {/* 🔥 Kolom fitur dari data asli */}
+                  {featureColumns.map((col, idx) => (
+                    <th key={idx} className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>
+                      {col}
+                    </th>
+                  ))}
+                  
+                  {/* 🔥 Kolom prediksi */}
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Prediksi</th>
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Confidence</th>
+                  {hasLabel && (
+                    <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Status</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-100"}`}>
+                {currentData.map((row, idx) => {
                   const globalIndex = startIndex + idx;
-                  
-                  let confidenceValue = pred.confidence_score || 0;
-                  let confidencePercent = 0;
-                  
-                  if (confidenceValue > 1) {
-                    confidencePercent = confidenceValue.toFixed(1);
-                  } else {
-                    confidencePercent = (confidenceValue * 100).toFixed(1);
-                  }
-                  
-                  const isCorrect = pred.is_correct;
+                  const rowClass = getClassColor(row.predicted_class);
                   
                   return (
-                    <tr key={globalIndex} className={isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}>
-                      <td className={`px-4 py-3 text-sm ${themeClasses.textMuted}`}>{globalIndex + 1}</td>
-                      <td className={`px-4 py-3 text-sm ${themeClasses.text}`}>
-                        {pred.actual_class || "-"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          pred.predicted_class === "Benign" 
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
-                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                        }`}>
-                          {pred.predicted_class}
+                    <tr 
+                      key={globalIndex} 
+                      className={`${isDarkMode ? "hover:bg-gray-700/50" : "hover:bg-gray-50"} transition-colors`}
+                    >
+                      <td className={`px-4 py-2 text-sm ${themeClasses.textMuted}`}>{row.row_index}</td>
+                      
+                      {/* 🔥 Data asli - setiap kolom */}
+                      {featureColumns.map((col, colIdx) => (
+                        <td key={colIdx} className={`px-4 py-2 text-sm ${themeClasses.text}`}>
+                          {row[col] !== undefined && row[col] !== null ? String(row[col]) : '-'}
+                        </td>
+                      ))}
+                      
+                      {/* 🔥 Kolom Prediksi dengan Warna */}
+                      <td className="px-4 py-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${rowClass}`}>
+                          {row.predicted_class}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      
+                      {/* Confidence */}
+                      <td className="px-4 py-2">
                         <div className="flex items-center gap-2">
-                          <div className={`w-20 rounded-full h-2 ${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
+                          <div className={`w-16 rounded-full h-1.5 ${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
                             <div
-                              className={`h-2 rounded-full ${
-                                confidencePercent >= 70 ? "bg-green-500" : confidencePercent >= 50 ? "bg-yellow-500" : "bg-red-500"
-                              }`}
-                              style={{ width: `${confidencePercent}%` }}
+                              className="h-1.5 rounded-full bg-blue-500"
+                              style={{ width: `${(row.confidence_score || 0) * 100}%` }}
                             ></div>
                           </div>
-                          <span className={`text-sm ${themeClasses.textMuted}`}>{confidencePercent}%</span>
+                          <span className={`text-xs ${themeClasses.textMuted}`}>
+                            {((row.confidence_score || 0) * 100).toFixed(1)}%
+                          </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        {hasLabel ? (
+                      
+                      {/* Status (jika ada label) */}
+                      {hasLabel && (
+                        <td className="px-4 py-2">
+                          {row.is_correct !== undefined && (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              row.is_correct 
+                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
+                                : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                            }`}>
+                              {row.is_correct ? "✅ Benar" : "❌ Salah"}
+                            </span>
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            // 🔥 Tabel Prediksi Standar
+            <table className="w-full">
+              <thead className={isDarkMode ? "bg-gray-700" : "bg-gray-50"}>
+                <tr>
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>#</th>
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Kelas Aktual</th>
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Prediksi</th>
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Confidence</th>
+                  <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Status</th>
+                </tr>
+              </thead>
+              <tbody className={`divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-100"}`}>
+                {currentPredictions.length > 0 ? (
+                  currentPredictions.map((pred, idx) => {
+                    const globalIndex = startIndex + idx;
+                    
+                    let confidenceValue = pred.confidence_score || 0;
+                    let confidencePercent = 0;
+                    
+                    if (confidenceValue > 1) {
+                      confidencePercent = confidenceValue.toFixed(1);
+                    } else {
+                      confidencePercent = (confidenceValue * 100).toFixed(1);
+                    }
+                    
+                    const isCorrect = pred.is_correct;
+                    
+                    return (
+                      <tr key={globalIndex} className={isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"}>
+                        <td className={`px-4 py-3 text-sm ${themeClasses.textMuted}`}>{globalIndex + 1}</td>
+                        <td className={`px-4 py-3 text-sm ${themeClasses.text}`}>
+                          {pred.actual_class || "-"}
+                        </td>
+                        <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            isCorrect 
+                            pred.predicted_class === "Benign" 
                               ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
                               : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                           }`}>
-                            {isCorrect ? "✅ Benar" : "❌ Salah"}
+                            {pred.predicted_class}
                           </span>
-                        ) : (
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            isDarkMode ? "bg-gray-700 text-gray-400" : "bg-gray-100 text-gray-500"
-                          }`}>
-                            ⚪ Tidak Ada Label
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5} className={`text-center py-8 ${themeClasses.textMuted}`}>
-                    Tidak ada data prediksi
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-20 rounded-full h-2 ${isDarkMode ? "bg-gray-700" : "bg-gray-200"}`}>
+                              <div
+                                className={`h-2 rounded-full ${
+                                  confidencePercent >= 70 ? "bg-green-500" : confidencePercent >= 50 ? "bg-yellow-500" : "bg-red-500"
+                                }`}
+                                style={{ width: `${confidencePercent}%` }}
+                              ></div>
+                            </div>
+                            <span className={`text-sm ${themeClasses.textMuted}`}>{confidencePercent}%</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {hasLabel ? (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              isCorrect 
+                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
+                                : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                            }`}>
+                              {isCorrect ? "✅ Benar" : "❌ Salah"}
+                            </span>
+                          ) : (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              isDarkMode ? "bg-gray-700 text-gray-400" : "bg-gray-100 text-gray-500"
+                            }`}>
+                              ⚪ Tidak Ada Label
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={5} className={`text-center py-8 ${themeClasses.textMuted}`}>
+                      Tidak ada data prediksi
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
 
         {/* Pagination */}

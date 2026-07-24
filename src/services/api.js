@@ -1,12 +1,18 @@
 // src/services/api.js
 import axios from "axios";
 
+// 🔥 Gunakan proxy untuk development, langsung untuk production (membaca dari env)
+const API_URL = import.meta.env.DEV 
+  ? '/api' 
+  : (import.meta.env.VITE_API_URL || 'https://backend-testing-malware-classification.ryaze.my.id');
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: API_URL,
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 // Interceptor untuk menambahkan token
@@ -16,6 +22,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    console.log(`🔍 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
   (error) => Promise.reject(error)
@@ -23,9 +30,12 @@ api.interceptors.request.use(
 
 // Interceptor untuk handle 401
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`✅ API Response: ${response.status} ${response.config.url}`);
+    return response;
+  },
   (error) => {
-    // 🔥 PERBAIKAN: Handle error dengan aman
+    console.error(`❌ API Error:`, error.message);
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("username");
