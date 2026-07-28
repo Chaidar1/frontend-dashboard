@@ -4,7 +4,7 @@ import axios from "axios";
 // 🔥 Gunakan proxy untuk development, langsung untuk production (membaca dari env)
 const API_URL = import.meta.env.DEV 
   ? '/api' 
-  : (import.meta.env.VITE_API_URL || 'https://backend-testing-malware-classification.ryaze.my.id');
+  : (import.meta.env.VITE_API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
