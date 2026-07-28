@@ -324,7 +324,7 @@ export default function DashboardAdmin() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className={`text-2xl font-bold ${themeClasses.text}`}>Dashboard Admin</h1>
-          <p className={themeClasses.textMuted}>Selamat datang di Dashboard Admin - Monitoring Klasifikasi Malware</p>
+          <p className={themeClasses.textMuted}>Selamat datang Di Dashboard Admin - Monitoring Klasifikasi Malware</p>
         </div>
         <button
           onClick={toggleTheme}
