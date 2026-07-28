@@ -323,8 +323,8 @@ export default function DashboardAdmin() {
       {/* Header dengan Dark Mode Toggle */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className={`text-2xl font-bold ${themeClasses.text}`}>Dashboard ADMIN</h1>
-          <p className={themeClasses.textMuted}>Selamat Datang Di Dashboard Admin - Monitoring Klasifikasi Malware</p>
+          <h1 className={`text-2xl font-bold ${themeClasses.text}`}>Dashboard Admin</h1>
+          <p className={themeClasses.textMuted}>Selamat Datang di Dashboard Admin - Monitoring Klasifikasi Malware</p>
         </div>
         <button
           onClick={toggleTheme}
