@@ -38,7 +38,7 @@ export const ThemeProvider = ({ children }) => {
     setIsDarkMode(prev => !prev);
   };
 
-  // 🔥 TAMBAHKAN themeClasses DI SINI
+  // themeClasses 
   const themeClasses = {
     // Background classes
     bg: isDarkMode ? "bg-gray-900" : "bg-gray-50",

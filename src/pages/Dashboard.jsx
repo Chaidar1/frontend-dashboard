@@ -78,7 +78,7 @@ export default function Dashboard() {
     hasConfidenceData: false
   });
 
-  // 🔥 State untuk filter mode chart
+  // State untuk filter mode chart
   const [chartMode, setChartMode] = useState("prediction");
 
   const CHART_COLORS = isDarkMode ? CHART_COLORS_DARK : CHART_COLORS_LIGHT;
@@ -93,16 +93,16 @@ export default function Dashboard() {
         
         const history = historyResponse.data || [];
         
-        // 🔥 Cek apakah ada data dengan label
+        // Cek apakah ada data dengan label
         const hasLabelData = history.some(test => test.has_label === true);
         
-        // 🔥 Cek apakah ada data dengan confidence
+        // Cek apakah ada data dengan confidence
         const hasConfidenceData = history.length > 0;
         
-        // 🔥 Hitung total sampel
+        // Hitung total sampel
         const totalSamples = history.reduce((sum, item) => sum + (item.samples || 0), 0);
         
-        // 🔥 Hitung rata-rata metrik (hitung hanya jika nilai tidak null)
+        // Hitung rata-rata metrik (hitung hanya jika nilai tidak null)
         let totalAccuracy = 0;
         let totalMacroF1 = 0;
         let accuracyCount = 0;
@@ -119,7 +119,7 @@ export default function Dashboard() {
           }
         });
         
-        // 🔥 Hitung rata-rata confidence
+        // Hitung rata-rata confidence
         let totalConfidence = 0;
         let confidenceCount = 0;
         history.forEach(item => {
@@ -146,7 +146,7 @@ export default function Dashboard() {
           }))
         });
 
-        // 🔥 Set chart mode default
+        // Set chart mode default
         if (hasLabelData) {
           setChartMode("label");
         } else {
@@ -163,7 +163,7 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
-  // 🔥 Stat Cards - Tetap 4 Card (Total Pengujian, Total Sampel, Confidence, Model Aktif)
+  // Stat Cards - Tetap 4 Card (Total Pengujian, Total Sampel, Confidence, Model Aktif)
   const statCards = [
     {
       title: "Total Pengujian",
@@ -203,7 +203,7 @@ export default function Dashboard() {
     color: isDarkMode ? '#f3f4f6' : '#1f2937'
   };
 
-  // 🔥 Render performance chart berdasarkan mode
+  // Render performance chart berdasarkan mode
   const renderPerformanceChart = () => {
     if (stats.performanceHistory.length === 0) {
       return (
@@ -215,7 +215,7 @@ export default function Dashboard() {
       );
     }
 
-    // 🔥 Mode Label: Tampilkan Akurasi & Macro-F1
+    // Mode Label: Tampilkan Akurasi & Macro-F1
     if (chartMode === "label" && stats.hasLabelData) {
       return (
         <ResponsiveContainer width="100%" height={300}>
@@ -248,7 +248,7 @@ export default function Dashboard() {
       );
     }
 
-    // 🔥 Mode Prediksi: Tampilkan Confidence Score
+    // Mode Prediksi: Tampilkan Confidence Score
     if (chartMode === "prediction") {
       const hasConfidenceData = stats.performanceHistory.some(item => item.avg_confidence !== null && item.avg_confidence !== undefined);
       
@@ -300,7 +300,7 @@ export default function Dashboard() {
     );
   }
 
-  // 🔥 Tentukan apakah dropdown harus muncul
+  // Tentukan apakah dropdown harus muncul
   const showModeDropdown = stats.hasLabelData;
 
   return (
@@ -363,7 +363,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 🔥 Stat Cards Grid - 4 Card Tetap (Total Pengujian, Total Sampel, Confidence, Model Aktif) */}
+      {/* Stat Cards Grid - 4 Card Tetap (Total Pengujian, Total Sampel, Confidence, Model Aktif) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {statCards.map((card, index) => (
           <motion.div
@@ -404,7 +404,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* 🔥 Performance Chart & Class Distribution - Dengan Dropdown */}
+      {/* Performance Chart & Class Distribution - Dengan Dropdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Performance History Chart */}
         <div className={`lg:col-span-2 rounded-xl shadow-sm border p-5 ${
@@ -419,7 +419,7 @@ export default function Dashboard() {
               <span className={`text-xs ${themeClasses.textMuted}`}>
                 {chartMode === "label" ? "Akurasi vs Macro-F1" : "Confidence Score"}
               </span>
-              {/* 🔥 Dropdown Mode - Hanya muncul jika ada data dengan label */}
+              {/* Dropdown Mode - Hanya muncul jika ada data dengan label */}
               {showModeDropdown && (
                 <div className="relative">
                   <select
@@ -442,7 +442,7 @@ export default function Dashboard() {
             </div>
           </div>
           
-          {/* 🔥 Render chart berdasarkan mode */}
+          {/* Render chart berdasarkan mode */}
           {renderPerformanceChart()}
         </div>
 
@@ -489,7 +489,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 🔥 Recent Tests Table - Dengan Kolom Confidence */}
+      {/* Recent Tests Table - Dengan Kolom Confidence */}
       <div className={`rounded-xl shadow-sm border overflow-hidden ${
         isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"
       }`}>

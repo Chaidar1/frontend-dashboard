@@ -50,7 +50,7 @@ export default function Results() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(50);
   
-  // 🔥 State untuk toggle tampilan data asli
+  // State untuk toggle tampilan data asli
   const [showRawData, setShowRawData] = useState(false);
 
   const COLORS = isDarkMode ? COLORS_DARK : COLORS_LIGHT;
@@ -143,7 +143,7 @@ export default function Results() {
     return (total / count).toFixed(1);
   };
 
-  // 🔥 Fungsi untuk mendapatkan warna berdasarkan kelas prediksi
+  // Fungsi untuk mendapatkan warna berdasarkan kelas prediksi
   const getClassColor = (predictedClass) => {
     const colors = {
       'Benign': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -160,7 +160,7 @@ export default function Results() {
     return colors[predictedClass] || 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
   };
 
-  // 🔥 Gabungkan data asli dengan prediksi
+  // Gabungkan data asli dengan prediksi
   const getCombinedData = () => {
     if (!result?.original_data || !result?.all_predictions) {
       return [];
@@ -200,7 +200,7 @@ export default function Results() {
     }));
   }
 
-  // 🔥 Data untuk tabel
+  // Data untuk tabel
   const combinedData = getCombinedData();
   const featureColumns = result?.feature_columns || [];
   const hasOriginalData = result?.original_data && result.original_data.length > 0;
@@ -221,7 +221,7 @@ export default function Results() {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
-  // 🔥 Toggle detail data dengan toast info jika tidak tersedia
+  // Toggle detail data dengan toast info jika tidak tersedia
   const toggleDetailData = () => {
     if (hasOriginalData) {
       setShowRawData(!showRawData);
@@ -280,9 +280,9 @@ export default function Results() {
         </button>
       </div>
 
-      {/* 🔥 Metrics Cards */}
+      {/* Metrics Cards */}
       {hasLabel ? (
-        // 🔥 Mode Evaluasi (Ada Label) - 5 Card dalam 1 baris dengan ukuran lebih kecil
+        // Mode Evaluasi (Ada Label) - 5 Card dalam 1 baris dengan ukuran lebih kecil
         <div className="grid grid-cols-5 gap-3">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -343,7 +343,7 @@ export default function Results() {
             </div>
           </motion.div>
 
-          {/* 🔥 Card Mode: Evaluasi */}
+          {/* Card Mode: Evaluasi */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -360,7 +360,7 @@ export default function Results() {
           </motion.div>
         </div>
       ) : (
-        // 🔥 Mode Prediksi (Tanpa Label) - 4 Card ukuran NORMAL (seperti semula)
+        // Mode Prediksi (Tanpa Label) - 4 Card ukuran NORMAL (seperti semula)
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -408,7 +408,7 @@ export default function Results() {
             </div>
           </motion.div>
 
-          {/* 🔥 Card Mode: Prediksi */}
+          {/* Card Mode: Prediksi */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -582,7 +582,7 @@ export default function Results() {
         </div>
       </div>
 
-      {/* 🔥 ALL Predictions Table - Dengan Detail Data */}
+      {/* ALL Predictions Table - Dengan Detail Data */}
       <div className={`rounded-xl shadow-sm border p-6 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="flex items-center gap-2">
@@ -595,7 +595,7 @@ export default function Results() {
             </h2>
           </div>
           <div className="flex items-center gap-3">
-            {/* 🔥 Button Detail Data - Selalu Tampil */}
+            {/* Button Detail Data - Selalu Tampil */}
             <button
               onClick={toggleDetailData}
               className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex items-center gap-2 ${
@@ -625,20 +625,20 @@ export default function Results() {
 
         <div className="overflow-x-auto">
           {showRawData && hasOriginalData ? (
-            // 🔥 Tabel Data Asli dengan Warna
+            // Tabel Data Asli dengan Warna
             <table className="w-full">
               <thead className={isDarkMode ? "bg-gray-700" : "bg-gray-50"}>
                 <tr>
                   <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>#</th>
                   
-                  {/* 🔥 Kolom fitur dari data asli */}
+                  {/* Kolom fitur dari data asli */}
                   {featureColumns.map((col, idx) => (
                     <th key={idx} className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>
                       {col}
                     </th>
                   ))}
                   
-                  {/* 🔥 Kolom prediksi */}
+                  {/* Kolom prediksi */}
                   <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Prediksi</th>
                   <th className={`px-4 py-3 text-left text-xs font-medium uppercase ${themeClasses.textMuted}`}>Confidence</th>
                   {hasLabel && (
@@ -665,7 +665,7 @@ export default function Results() {
                         </td>
                       ))}
                       
-                      {/* 🔥 Kolom Prediksi dengan Warna */}
+                      {/* Kolom Prediksi dengan Warna */}
                       <td className="px-4 py-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${rowClass}`}>
                           {row.predicted_class}
@@ -707,7 +707,7 @@ export default function Results() {
               </tbody>
             </table>
           ) : (
-            // 🔥 Tabel Prediksi Standar
+            // Tabel Prediksi Standar
             <table className="w-full">
               <thead className={isDarkMode ? "bg-gray-700" : "bg-gray-50"}>
                 <tr>

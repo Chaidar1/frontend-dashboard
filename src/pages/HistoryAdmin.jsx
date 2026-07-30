@@ -139,7 +139,7 @@ export default function HistoryAdmin() {
                       <Eye className="w-4 h-4" />
                       Detail
                     </Link>
-                    {/* 🔥 Tombol Hapus - Hanya untuk Admin */}
+                    {/* Tombol Hapus - Hanya untuk Admin */}
                     <button
                       onClick={() => handleDeleteHistory(item.id, item.filename)}
                       disabled={deleting === item.id}

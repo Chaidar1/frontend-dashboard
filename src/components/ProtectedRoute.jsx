@@ -69,6 +69,6 @@ export default function ProtectedRoute({ requiredRole, children }) {
 
   console.log("✅ Authorized, rendering children or Outlet");
   
-  // 🔥 Jika ada children, render children, otherwise render Outlet
+  // Jika ada children, render children, otherwise render Outlet
   return children ? children : <Outlet />;
 }

@@ -141,7 +141,7 @@ export default function Layout() {
           </div>
         </header>
 
-        {/* Main Content Area - Outlet untuk merender child routes */}
+        {/* Main Content Area */}
         <main className="p-6">
           <Outlet />
         </main>

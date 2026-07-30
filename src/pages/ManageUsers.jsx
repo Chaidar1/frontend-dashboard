@@ -85,7 +85,7 @@ export default function ManageUsers() {
     }
   };
 
-  // 🔥 Handle Add - Validasi & Buka Modal Konfirmasi
+  // Handle Add - Validasi & Buka Modal Konfirmasi
   const handleAddUserClick = (e) => {
     e.preventDefault();
     
@@ -115,17 +115,17 @@ export default function ManageUsers() {
     console.log("✅ Validasi lolos, tampilkan modal konfirmasi");
     console.log("🔍 showConfirmAddModal sebelum:", showConfirmAddModal);
     
-    // 🔥 Pastikan modal form tambah user ditutup dulu
+    // Pastikan modal form tambah user ditutup dulu
     setShowModal(false);
     
-    // 🔥 Kemudian tampilkan modal konfirmasi setelah delay kecil
+    // Kemudian tampilkan modal konfirmasi setelah delay kecil
     setTimeout(() => {
       setShowConfirmAddModal(true);
       console.log("🔍 showConfirmAddModal setelah:", true);
     }, 100);
   };
 
-  // 🔥 Handle Add - Konfirmasi
+  // Handle Add - Konfirmasi
   const handleConfirmAddUser = async () => {
     setConfirmAddLoading(true);
 
@@ -170,7 +170,7 @@ export default function ManageUsers() {
     }
   };
 
-  // 🔥 Handle Toggle - Cek status user
+  // Handle Toggle - Cek status user
   const handleToggleClick = (user) => {
     if (user.is_active) {
       setSelectedUser(user);
@@ -180,7 +180,7 @@ export default function ManageUsers() {
     }
   };
 
-  // 🔥 Handle Toggle - Konfirmasi Nonaktifkan
+  // Handle Toggle - Konfirmasi Nonaktifkan
   const handleConfirmToggle = async () => {
     if (!selectedUser) return;
     
@@ -203,7 +203,7 @@ export default function ManageUsers() {
     }
   };
 
-  // 🔥 Handle Toggle - Eksekusi langsung (tanpa validasi)
+  // Handle Toggle - Eksekusi langsung (tanpa validasi)
   const handleToggleUser = async (username) => {
     try {
       console.log(`🔄 Toggling user: ${username}`);
@@ -219,13 +219,13 @@ export default function ManageUsers() {
     }
   };
 
-  // 🔥 Handle Delete - Buka Modal Konfirmasi
+  // Handle Delete - Buka Modal Konfirmasi
   const handleDeleteClick = (user) => {
     setSelectedUser(user);
     setShowDeleteModal(true);
   };
 
-  // 🔥 Handle Delete - Konfirmasi
+  // Handle Delete - Konfirmasi
   const handleConfirmDelete = async () => {
     if (!selectedUser) return;
     
@@ -263,13 +263,13 @@ export default function ManageUsers() {
     });
   };
 
-  // 🔥 Handle Close Modal
+  // Handle Close Modal
   const handleCloseModal = () => {
     setShowModal(false);
     resetForm();
   };
 
-  // 🔥 Handle Close Confirm Modal
+  // Handle Close Confirm Modal
   const handleCloseConfirmModal = () => {
     setShowConfirmAddModal(false);
     resetForm();
@@ -304,7 +304,7 @@ export default function ManageUsers() {
       : "bg-red-100 text-red-700 border-red-200";
   };
 
-  // 🔥 Debug: Log state showConfirmAddModal
+  // Debug: Log state showConfirmAddModal
   console.log("🔍 Render - showConfirmAddModal:", showConfirmAddModal);
 
   if (loading) {
@@ -467,7 +467,7 @@ export default function ManageUsers() {
         </div>
       )}
 
-      {/* 🔥 Modal Detail User */}
+      {/* Modal Detail User */}
       {showDetailModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <motion.div
@@ -617,7 +617,7 @@ export default function ManageUsers() {
         </div>
       )}
 
-      {/* 🔥 Modal Konfirmasi Tambah User - DIPERBAIKI */}
+      {/* Modal Konfirmasi Tambah User - DIPERBAIKI */}
       {showConfirmAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <motion.div
@@ -709,7 +709,7 @@ export default function ManageUsers() {
         </div>
       )}
 
-      {/* 🔥 Modal Konfirmasi Nonaktifkan User */}
+      {/* Modal Konfirmasi Nonaktifkan User */}
       {showToggleModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <motion.div
@@ -802,7 +802,7 @@ export default function ManageUsers() {
         </div>
       )}
 
-      {/* 🔥 Modal Konfirmasi Hapus User */}
+      {/* Modal Konfirmasi Hapus User */}
       {showDeleteModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <motion.div
@@ -895,7 +895,7 @@ export default function ManageUsers() {
         </div>
       )}
 
-      {/* 🔥 Modal Tambah User - DIPERBAIKI */}
+      {/* Modal Tambah User */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <motion.div

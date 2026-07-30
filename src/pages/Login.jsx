@@ -21,7 +21,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // 🔥 Kirim sebagai JSON (sesuai dengan backend)
+      // Kirim sebagai JSON (sesuai dengan backend)
       const response = await api.post("/auth/login", {
         username: username,
         password: password
@@ -47,7 +47,7 @@ export default function Login() {
       
       let errorMessage = "Login gagal. Silakan coba lagi.";
       
-      // 🔥 Handle error dari backend
+      // Handle error dari backend
       if (error.response?.data?.detail) {
         if (typeof error.response.data.detail === "string") {
           errorMessage = error.response.data.detail;

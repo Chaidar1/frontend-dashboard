@@ -81,7 +81,7 @@ export default function DashboardAdmin() {
     hasConfidenceData: false
   });
   
-  // 🔥 State untuk filter mode chart
+  // State untuk filter mode chart
   const [chartMode, setChartMode] = useState("prediction"); // "label" atau "prediction"
 
   const CHART_COLORS = isDarkMode ? CHART_COLORS_DARK : CHART_COLORS_LIGHT;
@@ -98,16 +98,16 @@ export default function DashboardAdmin() {
         
         const history = historyResponse.data || [];
         
-        // 🔥 Cek apakah ada data dengan label
+        // Cek apakah ada data dengan label
         const hasLabelData = history.some(test => test.has_label === true);
         
-        // 🔥 Cek apakah ada data dengan confidence (selalu ada)
+        // Cek apakah ada data dengan confidence (selalu ada)
         const hasConfidenceData = history.length > 0;
         
-        // 🔥 Hitung total sampel
+        // Hitung total sampel
         const totalSamples = history.reduce((sum, item) => sum + (item.samples || 0), 0);
         
-        // 🔥 Hitung rata-rata metrik (hitung hanya jika nilai tidak null)
+        // Hitung rata-rata metrik (hitung hanya jika nilai tidak null)
         let totalAccuracy = 0;
         let totalMacroF1 = 0;
         let accuracyCount = 0;
@@ -124,7 +124,7 @@ export default function DashboardAdmin() {
           }
         });
         
-        // 🔥 Hitung rata-rata confidence dari recent tests
+        // Hitung rata-rata confidence dari recent tests
         let totalConfidence = 0;
         let confidenceCount = 0;
         history.forEach(item => {
@@ -138,7 +138,7 @@ export default function DashboardAdmin() {
         const recentTestsWithUser = history.slice(0, 5).map(item => ({
           ...item,
           username: item.username || "Unknown User",
-          // 🔥 Pastikan avg_confidence adalah angka atau null
+          // Pastikan avg_confidence adalah angka atau null
           avg_confidence: item.avg_confidence !== null && item.avg_confidence !== undefined ? item.avg_confidence : null
         }));
         
@@ -155,12 +155,12 @@ export default function DashboardAdmin() {
           classDistribution: response.data.classDistribution || [],
           performanceHistory: history.slice(0, 6).reverse().map(item => ({
             ...item,
-            // 🔥 Pastikan confidence ada di performance history
+            // Pastikan confidence ada di performance history
             avg_confidence: item.avg_confidence !== null && item.avg_confidence !== undefined ? item.avg_confidence : null
           }))
         });
 
-        // 🔥 Set chart mode default: jika ada label, tampilkan label, jika tidak, tampilkan prediction
+        // Set chart mode default: jika ada label, tampilkan label, jika tidak, tampilkan prediction
         if (hasLabelData) {
           setChartMode("label");
         } else {
@@ -177,7 +177,7 @@ export default function DashboardAdmin() {
     fetchStats();
   }, []);
 
-  // 🔥 Stat Cards - Hanya 4 card utama
+  // Stat Cards - Hanya 4 card utama
   const statCards = [
     {
       title: "Total Pengujian",
@@ -217,7 +217,7 @@ export default function DashboardAdmin() {
     color: isDarkMode ? '#f3f4f6' : '#1f2937'
   };
 
-  // 🔥 Render performance chart berdasarkan mode
+  // Render performance chart berdasarkan mode
   const renderPerformanceChart = () => {
     if (stats.performanceHistory.length === 0) {
       return (
@@ -229,7 +229,7 @@ export default function DashboardAdmin() {
       );
     }
 
-    // 🔥 Mode Label: Tampilkan Akurasi & Macro-F1
+    // Mode Label: Tampilkan Akurasi & Macro-F1
     if (chartMode === "label" && stats.hasLabelData) {
       return (
         <ResponsiveContainer width="100%" height={300}>
@@ -262,9 +262,9 @@ export default function DashboardAdmin() {
       );
     }
 
-    // 🔥 Mode Prediksi (Non-Label): Tampilkan Confidence Score
+    // Mode Prediksi (Non-Label): Tampilkan Confidence Score
     if (chartMode === "prediction") {
-      // 🔥 Cek apakah ada data confidence
+      // Cek apakah ada data confidence
       const hasConfidenceData = stats.performanceHistory.some(item => item.avg_confidence !== null && item.avg_confidence !== undefined);
       
       if (hasConfidenceData) {
@@ -315,7 +315,7 @@ export default function DashboardAdmin() {
     );
   }
 
-  // 🔥 Tentukan apakah dropdown harus muncul
+  // Tentukan apakah dropdown harus muncul
   const showModeDropdown = stats.hasLabelData;
 
   return (
@@ -438,7 +438,7 @@ export default function DashboardAdmin() {
               <span className={`text-xs ${themeClasses.textMuted}`}>
                 {chartMode === "label" ? "Akurasi vs Macro-F1" : "Confidence Score"}
               </span>
-              {/* 🔥 Dropdown Mode - Hanya muncul jika ada data dengan label */}
+              {/* Dropdown Mode - Hanya muncul jika ada data dengan label */}
               {showModeDropdown && (
                 <div className="relative">
                   <select
@@ -461,7 +461,7 @@ export default function DashboardAdmin() {
             </div>
           </div>
           
-          {/* 🔥 Render chart berdasarkan mode */}
+          {/* Render chart berdasarkan mode */}
           {renderPerformanceChart()}
         </div>
 
@@ -567,7 +567,7 @@ export default function DashboardAdmin() {
                     <td className={`px-5 py-3 text-sm font-medium ${themeClasses.text}`}>{test.filename}</td>
                     <td className={`px-5 py-3 text-sm ${themeClasses.textMuted}`}>{test.samples || test.total_samples}</td>
                     
-                    {/* 🔥 Kolom Confidence */}
+                    {/* Kolom Confidence */}
                     <td className="px-5 py-3">
                       {test.avg_confidence !== null && test.avg_confidence !== undefined ? (
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -586,7 +586,7 @@ export default function DashboardAdmin() {
                       )}
                     </td>
                     
-                    {/* 🔥 Kolom Akurasi */}
+                    {/* Kolom Akurasi */}
                     <td className="px-5 py-3">
                       {test.accuracy !== null && test.accuracy !== undefined ? (
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -605,7 +605,7 @@ export default function DashboardAdmin() {
                       )}
                     </td>
                     
-                    {/* 🔥 Kolom Macro-F1 */}
+                    {/* Kolom Macro-F1 */}
                     <td className={`px-5 py-3 text-sm ${themeClasses.textMuted}`}>
                       {test.macro_f1 !== null && test.macro_f1 !== undefined ? `${test.macro_f1}%` : 'N/A'}
                     </td>
@@ -644,7 +644,7 @@ export default function DashboardAdmin() {
       {/* Footer */}
       <div className="text-center py-4">
         <p className={`text-xs ${themeClasses.textMuted}`}>
-          &copy; 2026 Malware Detection System • Barlow Twins • CSSL • Redundancy Reduction • Admin Dashboard
+          &copy; 2026 Malware Detection System • Barlow Twins • CSSL • Redundancy Reduction • Dashboard Admin
         </p>
       </div>
     </div>

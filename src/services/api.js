@@ -1,11 +1,11 @@
 // src/services/api.js
 import axios from "axios";
 
-// 🔥 Deteksi environment dengan fallback URL
+// Deteksi environment dengan fallback URL
 const isDevelopment = import.meta.env.DEV;
 const isProduction = import.meta.env.PROD;
 
-// 🔥 URL API dengan fallback yang jelas
+// URL API dengan fallback yang jelas
 let API_URL;
 
 if (isDevelopment) {
@@ -22,7 +22,7 @@ if (isDevelopment) {
   console.log('⚠️ Unknown environment - Using fallback: /api');
 }
 
-// 🔥 Debug: Tampilkan URL yang digunakan
+// Debug: Tampilkan URL yang digunakan
 console.log(`🔗 API Base URL: ${API_URL}`);
 
 const api = axios.create({
@@ -31,7 +31,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  // 🔥 Hapus withCredentials jika tidak pakai cookie
+  // Hapus withCredentials jika tidak pakai cookie
   // withCredentials: true,  // ← HAPUS atau comment
 });
 
@@ -43,7 +43,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // 🔥 Logging lengkap untuk debug
+    // Logging lengkap untuk debug
     console.log(`🔍 API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
     console.log(`   Headers:`, config.headers);
     
@@ -62,7 +62,7 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // 🔥 Logging lengkap untuk error
+    // Logging lengkap untuk error
     console.error(`❌ API Error:`, error.message);
     console.error(`   Status:`, error.response?.status);
     console.error(`   Data:`, error.response?.data);
